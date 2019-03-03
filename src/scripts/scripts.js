@@ -3,7 +3,7 @@ window.addEventListener("load", () => {
   const h = window.innerHeight * window.devicePixelRatio;
   const w = h * (16 / 9);
   const s = h / 1775;
-  const b = 1;
+  const b = 2;
 
   const game = new Phaser.Game(w, h, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
   let player = null;
@@ -67,8 +67,8 @@ window.addEventListener("load", () => {
       }
       this.sprite.anchor.setTo(0.5, 0.5);
       this.sprite.scale.set(s, s);
-      this.sprite.x = w * b * 0.5;
-      this.sprite.y = h * b * 0.5;
+      this.sprite.x = w * b * Math.random();
+      this.sprite.y = h * b * Math.random();
       this.health = 100;
       this.speed = 600;
       game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
