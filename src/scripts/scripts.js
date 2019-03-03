@@ -42,15 +42,15 @@ window.addEventListener("load", () => {
     ship.body.velocity.y = 0;
     ship.body.angularVelocity = 0;
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+    if (game.input.keyboard.isDown(Phaser.Keyboard.A) || game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
       ship.body.angularVelocity = -400;
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D) || game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
       ship.body.angularVelocity = 400;
     }
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
+    if (game.input.keyboard.isDown(Phaser.Keyboard.W) || game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
       game.physics.arcade.velocityFromAngle(ship.angle - 90, speed, ship.body.velocity);
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S) || game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
       game.physics.arcade.velocityFromAngle(ship.angle - 90, -speed, ship.body.velocity);
     }
 
