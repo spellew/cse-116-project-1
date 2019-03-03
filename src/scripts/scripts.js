@@ -22,6 +22,8 @@ window.addEventListener("load", () => {
   
   function create() {
 
+    let text = null;
+
     game.physics.startSystem(Phaser.Physics.ARCADE);
 
     game.add.tileSprite(0, 0, w * b, h * b, 'backdrop');
@@ -32,6 +34,13 @@ window.addEventListener("load", () => {
     enemies.group = game.add.group();
 
     enemy = new Enemy();
+
+    text = game.add.text(w * 0.5, h - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL;", {
+      font: "32px Arial",
+      fill: "#fff",
+    });
+
+    text.anchor.setTo(0.5, 0.5);
     
   }
   
