@@ -1,6 +1,6 @@
 const h = window.innerHeight * window.devicePixelRatio;
 const w = h * (16 / 9);
-const s = h / 1850;
+const s = h / 1775;
 
 
 window.addEventListener("load", () => {
