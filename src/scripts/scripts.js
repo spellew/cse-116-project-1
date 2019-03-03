@@ -7,6 +7,7 @@ window.addEventListener("load", () => {
 
   const game = new Phaser.Game(w, h, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
   let player = null;
+  let enemy = null;
   let enemies = null;
 
   function preload() {
@@ -14,7 +15,8 @@ window.addEventListener("load", () => {
     game.load.image('backdrop', 'assets/backgrounds/darkPurple.png');
     game.load.image('player', 'assets/playerShip1_blue.png');
     game.load.image('enemy', 'assets/playerShip1_red.png');
-    game.load.image('bullet', 'assets/lasers/laserBlue03.png');
+    game.load.image('player_bullet', 'assets/lasers/laserBlue03.png');
+    game.load.image('enemy_bullet', 'assets/lasers/laserRed03.png');
   
   }
   
@@ -29,7 +31,7 @@ window.addEventListener("load", () => {
     enemies = [];
     enemies.group = game.add.group();
 
-    new Ship({ enemy: true });
+    enemy = new Ship({ enemy: true });
     
   }
   
@@ -39,41 +41,83 @@ window.addEventListener("load", () => {
     player.sprite.body.velocity.y = 0;
     player.sprite.body.angularVelocity = 0;
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.A) || game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
-      player.sprite.body.angularVelocity = -400;
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D) || game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)) {
-      player.sprite.body.angularVelocity = 400;
+    enemy.sprite.body.velocity.x = 0;
+    enemy.sprite.body.velocity.y = 0;
+    enemy.sprite.body.angularVelocity = 0;
+
+    if (player.sprite.alive) {
+
+      if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+        player.sprite.body.angularVelocity = -400;
+      } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+        player.sprite.body.angularVelocity = 400;
+      }
+
+      if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
+        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, player.speed, player.sprite.body.velocity);
+      } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, -player.speed, player.sprite.body.velocity);
+      }
+
+      if (game.input.keyboard.isDown(Phaser.Keyboard.ALT)) {
+        player.sprite.weapon.fire();
+      }
+
     }
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.W) || game.input.keyboard.isDown(Phaser.Keyboard.UP)) {
-      game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, player.speed, player.sprite.body.velocity);
-    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S) || game.input.keyboard.isDown(Phaser.Keyboard.DOWN)) {
-      game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, -player.speed, player.sprite.body.velocity);
-    }
+    if (enemy.sprite.alive) {
 
-    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-      player.weapon.fire();
+      if (game.input.keyboard.isDown(Phaser.Keyboard.J)) {
+        enemy.sprite.body.angularVelocity = -400;
+      } else if (game.input.keyboard.isDown(Phaser.Keyboard.L)) {
+        enemy.sprite.body.angularVelocity = 400;
+      }
+
+      if (game.input.keyboard.isDown(Phaser.Keyboard.I)) {
+        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, enemy.speed, enemy.sprite.body.velocity);
+      } else if (game.input.keyboard.isDown(Phaser.Keyboard.K)) {
+        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, -enemy.speed, enemy.sprite.body.velocity);
+      }
+
+      if (game.input.keyboard.isDown(Phaser.Keyboard.CONTROL)) {
+        enemy.sprite.weapon.fire();
+      }
+
     }
 
     game.world.wrap(player.sprite, 0, true);
     player.sprite.healthBar.setPosition(player.sprite.x, player.sprite.y + 60);
-    player.weapon.fireAngle = player.sprite.angle - 90;
+    player.sprite.weapon.fireAngle = player.sprite.angle - 90;
 
-    enemies.forEach(enemy => {
-      game.world.wrap(enemy.sprite, 0, true);
-      enemy.sprite.healthBar.setPosition(enemy.sprite.x, enemy.sprite.y + 60);
-    });
-
-    // game.physics.arcade.overlap(player.sprite, enemies.group, () => "overlap");
-    game.physics.arcade.overlap(player.weapon.bullets, enemies.group, (bullet, enemy) => {
+    game.physics.arcade.overlap(player.sprite.weapon.bullets, enemies.group, (bullet, enemy) => {
       bullet.kill();
       enemy.health -= 10;
       enemy.healthBar.setPercent(enemy.health / enemy.maxHealth * 100);
       if (enemy.health <= 0) {
+        enemy.weapon.bullets.killAll();
         enemy.healthBar.kill();
         enemy.kill();
       }
     });
+
+    enemies.group.forEach(enemy => {
+      game.world.wrap(enemy, 0, true);
+      enemy.healthBar.setPosition(enemy.x, enemy.y + 60);
+      enemy.weapon.fireAngle = enemy.angle - 90;
+      game.physics.arcade.overlap(enemy.weapon.bullets, player.sprite, (player, bullet) => {
+        console.log("player", player);
+        bullet.kill();
+        player.health -= 10;
+        player.healthBar.setPercent(player.health / player.maxHealth * 100);
+        if (player.health <= 0) {
+          player.weapon.bullets.killAll();
+          player.healthBar.kill();
+          player.kill();
+        }
+      });
+    });
+
+    // game.physics.arcade.overlap(player.sprite, enemies.group, () => "overlap");
 
   }
 
@@ -83,9 +127,11 @@ window.addEventListener("load", () => {
     constructor({ player, enemy }) {
       if (player) {
         this.sprite = game.add.sprite(0, 0, 'player');
+        this.sprite.weapon = game.add.weapon(30, 'player_bullet');
         game.camera.follow(this.sprite);
       } else if (enemy) {
         this.sprite = game.add.sprite(0, 0, 'enemy');
+        this.sprite.weapon = game.add.weapon(30, 'enemy_bullet');
         enemies.group.add(this.sprite);
       }
       this.sprite.anchor.setTo(0.5, 0.5);
@@ -96,13 +142,12 @@ window.addEventListener("load", () => {
       this.sprite.maxHealth = 100;
       this.sprite.healthBar = new HealthBar(game, { x: this.sprite.x, y: this.sprite.y + 60, width: 85, height: 8, bg: { color: '#fff' }, bar: { color: '#2ecc71' } });
       this.speed = 625;
-      this.weapon = game.add.weapon(30, 'bullet');
-      this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
-      this.weapon.bulletLifespan = 750;
-      this.weapon.bulletAngleOffset = 90;
-      this.weapon.bulletSpeed = 1000;
-      this.weapon.bulletWorldWrap = true;
-      this.weapon.trackSprite(this.sprite, 0, 0);
+      this.sprite.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
+      this.sprite.weapon.bulletLifespan = 750;
+      this.sprite.weapon.bulletAngleOffset = 90;
+      this.sprite.weapon.bulletSpeed = 1000;
+      this.sprite.weapon.bulletWorldWrap = true;
+      this.sprite.weapon.trackSprite(this.sprite, 0, 0);
       game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     }
     
