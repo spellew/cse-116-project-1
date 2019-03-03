@@ -27,11 +27,11 @@ window.addEventListener("load", () => {
     game.add.tileSprite(0, 0, w * b, h * b, 'backdrop');
     game.world.setBounds(0, 0, w * b, h * b);
 
-    player = new Ship({ player: true });
+    player = new Player();
     enemies = [];
     enemies.group = game.add.group();
 
-    enemy = new Ship({ enemy: true });
+    enemy = new Enemy();
     
   }
   
@@ -54,9 +54,9 @@ window.addEventListener("load", () => {
       }
 
       if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
-        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, player.speed, player.sprite.body.velocity);
+        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, player.sprite.speed, player.sprite.body.velocity);
       } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
-        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, -player.speed, player.sprite.body.velocity);
+        game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, -player.sprite.speed, player.sprite.body.velocity);
       }
 
       if (game.input.keyboard.isDown(Phaser.Keyboard.ALT)) {
@@ -74,9 +74,9 @@ window.addEventListener("load", () => {
       }
 
       if (game.input.keyboard.isDown(Phaser.Keyboard.I)) {
-        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, enemy.speed, enemy.sprite.body.velocity);
+        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, enemy.sprite.speed, enemy.sprite.body.velocity);
       } else if (game.input.keyboard.isDown(Phaser.Keyboard.K)) {
-        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, -enemy.speed, enemy.sprite.body.velocity);
+        game.physics.arcade.velocityFromAngle(enemy.sprite.angle - 90, -enemy.sprite.speed, enemy.sprite.body.velocity);
       }
 
       if (game.input.keyboard.isDown(Phaser.Keyboard.CONTROL)) {
@@ -105,7 +105,6 @@ window.addEventListener("load", () => {
       enemy.healthBar.setPosition(enemy.x, enemy.y + 60);
       enemy.weapon.fireAngle = enemy.angle - 90;
       game.physics.arcade.overlap(enemy.weapon.bullets, player.sprite, (player, bullet) => {
-        console.log("player", player);
         bullet.kill();
         player.health -= 10;
         player.healthBar.setPercent(player.health / player.maxHealth * 100);
@@ -124,16 +123,8 @@ window.addEventListener("load", () => {
 
   class Ship {
 
-    constructor({ player, enemy }) {
-      if (player) {
-        this.sprite = game.add.sprite(0, 0, 'player');
-        this.sprite.weapon = game.add.weapon(30, 'player_bullet');
-        game.camera.follow(this.sprite);
-      } else if (enemy) {
-        this.sprite = game.add.sprite(0, 0, 'enemy');
-        this.sprite.weapon = game.add.weapon(30, 'enemy_bullet');
-        enemies.group.add(this.sprite);
-      }
+    constructor({ sprite, weapon }) {
+      this.sprite = sprite;
       this.sprite.anchor.setTo(0.5, 0.5);
       this.sprite.scale.set(s, s);
       this.sprite.x = w * b * Math.random();
@@ -141,7 +132,8 @@ window.addEventListener("load", () => {
       this.sprite.health = 100;
       this.sprite.maxHealth = 100;
       this.sprite.healthBar = new HealthBar(game, { x: this.sprite.x, y: this.sprite.y + 60, width: 85, height: 8, bg: { color: '#fff' }, bar: { color: '#2ecc71' } });
-      this.speed = 625;
+      this.sprite.speed = 625;
+      this.sprite.weapon = weapon;
       this.sprite.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
       this.sprite.weapon.bulletLifespan = 750;
       this.sprite.weapon.bulletAngleOffset = 90;
@@ -151,6 +143,30 @@ window.addEventListener("load", () => {
       game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     }
     
+  }
+
+  class Player extends Ship {
+
+    constructor() {
+      super({
+        sprite: game.add.sprite(0, 0, 'player'),
+        weapon: game.add.weapon(30, 'player_bullet')
+      });
+      game.camera.follow(this.sprite);
+    }
+
+  }
+
+  class Enemy extends Ship {
+
+    constructor() {
+      super({
+        sprite: game.add.sprite(0, 0, 'enemy'),
+        weapon: game.add.weapon(30, 'enemy_bullet')
+      });
+      enemies.group.add(this.sprite);
+    }
+
   }
 
 });
