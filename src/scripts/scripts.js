@@ -6,7 +6,6 @@ const s = h / 1850;
 window.addEventListener("load", () => {
 
   const game = new Phaser.Game(w, h, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
-  let manager = null;
   let ship = null;
 
   function preload() {
@@ -21,11 +20,6 @@ window.addEventListener("load", () => {
     const b = 9;
 
     game.physics.startSystem(Phaser.Physics.ARCADE);
-
-    manager = nipplejs.create({
-      zone: document.body,
-      color: 'white'
-    });
 
     game.add.tileSprite(0, 0, w * b, h * b, 'backdrop');
     game.world.setBounds(0, 0, w * b, h * b);
@@ -42,21 +36,23 @@ window.addEventListener("load", () => {
   
   function update () {
 
-    const speed = 85;
+    const speed = 800;
 
-    manager.on('move', function (evt, data) {
-  
-      ship.angle = -(data.angle.degree - 90);
-      game.physics.arcade.velocityFromAngle(-data.angle.degree, speed * data.force, ship.body.velocity);
+    ship.body.velocity.x = 0;
+    ship.body.velocity.y = 0;
+    ship.body.angularVelocity = 0;
 
-    });
+    if (game.input.keyboard.isDown(Phaser.Keyboard.A)) {
+      ship.body.angularVelocity = -400;
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.D)) {
+      ship.body.angularVelocity = 400;
+    }
 
-    manager.on('end', function (evt, data) {
-
-      ship.body.velocity.x = 0;
-      ship.body.velocity.y = 0;
-
-    });
+    if (game.input.keyboard.isDown(Phaser.Keyboard.W)) {
+      game.physics.arcade.velocityFromAngle(ship.angle - 90, speed, ship.body.velocity);
+    } else if (game.input.keyboard.isDown(Phaser.Keyboard.S)) {
+      game.physics.arcade.velocityFromAngle(ship.angle - 90, -speed, ship.body.velocity);
+    }
 
     game.world.wrap(ship, 0, true);
 
