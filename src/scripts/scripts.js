@@ -11,8 +11,9 @@ window.addEventListener("load", () => {
 
   function preload() {
 
-    game.load.image('backdrop', 'assets/backdrop.png');
-    game.load.image('ship', 'assets/ship.png');
+    game.load.image('backdrop', 'assets/backgrounds/darkPurple.png');
+    game.load.image('player', 'assets/playerShip1_blue.png');
+    game.load.image('enemy', 'assets/playerShip1_red.png');
   
   }
   
@@ -57,7 +58,13 @@ window.addEventListener("load", () => {
   class Ship {
 
     constructor({ player, enemy }) {
-      this.sprite = game.add.sprite(0, 0, 'ship');
+      if (player) {
+        this.sprite = game.add.sprite(0, 0, 'player');
+        game.camera.follow(this.sprite);
+      } else if (enemy) {
+        this.sprite = game.add.sprite(0, 0, 'enemy');
+        enemies.add(this.sprite);
+      }
       this.sprite.anchor.setTo(0.5, 0.5);
       this.sprite.scale.set(s, s);
       this.sprite.x = w * b * 0.5;
@@ -65,7 +72,6 @@ window.addEventListener("load", () => {
       this.health = 100;
       this.speed = 600;
       game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
-      player ? game.camera.follow(this.sprite) : enemy ? enemies.add(this.sprite) : null;
     }
     
   }
