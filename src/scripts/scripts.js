@@ -3,7 +3,7 @@ window.addEventListener("load", () => {
   const h = window.innerHeight * window.devicePixelRatio;
   const w = h * (16 / 9);
   const s = h / 1775;
-  const b = 2;
+  const b = 1;
 
   const game = new Phaser.Game(w, h, Phaser.AUTO, 'phaser-example', { preload: preload, create: create, update: update });
   let player = null;
@@ -14,6 +14,7 @@ window.addEventListener("load", () => {
     game.load.image('backdrop', 'assets/backgrounds/darkPurple.png');
     game.load.image('player', 'assets/playerShip1_blue.png');
     game.load.image('enemy', 'assets/playerShip1_red.png');
+    game.load.image('bullet', 'assets/lasers/laserBlue03.png');
   
   }
   
@@ -25,7 +26,10 @@ window.addEventListener("load", () => {
     game.world.setBounds(0, 0, w * b, h * b);
 
     player = new Ship({ player: true });
-    enemies = game.add.group();
+    enemies = [];
+    enemies.group = game.add.group();
+
+    new Ship({ enemy: true });
     
   }
   
@@ -47,10 +51,29 @@ window.addEventListener("load", () => {
       game.physics.arcade.velocityFromAngle(player.sprite.angle - 90, -player.speed, player.sprite.body.velocity);
     }
 
-    game.world.wrap(player.sprite, 0, true);
-    enemies.children.forEach(enemy => game.world.wrap(enemy, 0, true));
+    if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+      player.weapon.fire();
+    }
 
-    // game.physics.arcade.collide(player.sprite, enemies, () => "overlap");
+    game.world.wrap(player.sprite, 0, true);
+    player.sprite.healthBar.setPosition(player.sprite.x, player.sprite.y + 60);
+    player.weapon.fireAngle = player.sprite.angle - 90;
+
+    enemies.forEach(enemy => {
+      game.world.wrap(enemy.sprite, 0, true);
+      enemy.sprite.healthBar.setPosition(enemy.sprite.x, enemy.sprite.y + 60);
+    });
+
+    // game.physics.arcade.overlap(player.sprite, enemies.group, () => "overlap");
+    game.physics.arcade.overlap(player.weapon.bullets, enemies.group, (bullet, enemy) => {
+      bullet.kill();
+      enemy.health -= 10;
+      enemy.healthBar.setPercent(enemy.health / enemy.maxHealth * 100);
+      if (enemy.health <= 0) {
+        enemy.healthBar.kill();
+        enemy.kill();
+      }
+    });
 
   }
 
@@ -63,14 +86,23 @@ window.addEventListener("load", () => {
         game.camera.follow(this.sprite);
       } else if (enemy) {
         this.sprite = game.add.sprite(0, 0, 'enemy');
-        enemies.add(this.sprite);
+        enemies.group.add(this.sprite);
       }
       this.sprite.anchor.setTo(0.5, 0.5);
       this.sprite.scale.set(s, s);
       this.sprite.x = w * b * Math.random();
       this.sprite.y = h * b * Math.random();
-      this.health = 100;
-      this.speed = 600;
+      this.sprite.health = 100;
+      this.sprite.maxHealth = 100;
+      this.sprite.healthBar = new HealthBar(game, { x: this.sprite.x, y: this.sprite.y + 60, width: 85, height: 8, bg: { color: '#fff' }, bar: { color: '#2ecc71' } });
+      this.speed = 625;
+      this.weapon = game.add.weapon(30, 'bullet');
+      this.weapon.bulletKillType = Phaser.Weapon.KILL_LIFESPAN;
+      this.weapon.bulletLifespan = 750;
+      this.weapon.bulletAngleOffset = 90;
+      this.weapon.bulletSpeed = 1000;
+      this.weapon.bulletWorldWrap = true;
+      this.weapon.trackSprite(this.sprite, 0, 0);
       game.physics.enable(this.sprite, Phaser.Physics.ARCADE);
     }
     
