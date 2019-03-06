@@ -35,7 +35,7 @@ window.addEventListener("load", () => {
 
     enemy = new Enemy();
 
-    text = game.add.text(w * 0.5, h - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL;", {
+    text = game.add.text(w * 0.5, h - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL; Restart: CTRL+SHIFT+R;", {
       font: "32px Arial",
       fill: "#fff",
     });
