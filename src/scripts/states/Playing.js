@@ -4,7 +4,9 @@ class Playing extends Phaser.State {
 
   create() {
 
-    let text = null;
+    console.log("game", this.game);
+    this.paused = false;
+    this.text = null;
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -16,12 +18,12 @@ class Playing extends Phaser.State {
     this.map.player = new Player({ game: this.game, map: this.map });
     this.map.enemy = new Enemy({ game: this.game, map: this.map });
 
-    text = this.game.add.text(this.map.meta.width * 0.5, this.map.meta.height - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL; Restart: CTRL+SHIFT+R;", {
+    this.text = this.game.add.text(this.map.meta.width * 0.5, this.map.meta.height - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL;", {
       font: "32px Arial",
       fill: "#fff",
     });
 
-    text.anchor.setTo(0.5, 0.5);
+    this.text.anchor.setTo(0.5, 0.5);
     
   }
 
@@ -35,7 +37,7 @@ class Playing extends Phaser.State {
     this.map.enemy.sprite.body.velocity.y = 0;
     this.map.enemy.sprite.body.angularVelocity = 0;
 
-    if (this.map.player.sprite.alive) {
+    if (this.map.player.sprite.alive && !this.paused) {
 
       if (this.game.input.keyboard.isDown(Phaser.Keyboard.A)) {
         this.map.player.sprite.body.angularVelocity = -400;
@@ -55,7 +57,7 @@ class Playing extends Phaser.State {
 
     }
 
-    if (this.map.enemy.sprite.alive) {
+    if (this.map.enemy.sprite.alive && !this.paused) {
 
       if (this.game.input.keyboard.isDown(Phaser.Keyboard.J)) {
         this.map.enemy.sprite.body.angularVelocity = -400;
@@ -87,6 +89,8 @@ class Playing extends Phaser.State {
         enemy.weapon.bullets.killAll();
         enemy.healthBar.kill();
         enemy.kill();
+        this.paused = true;
+        window.setTimeout(() => this.game.state.start("GameOver", true, false, this.map), 750);
       }
     });
 
@@ -102,6 +106,8 @@ class Playing extends Phaser.State {
           player.weapon.bullets.killAll();
           player.healthBar.kill();
           player.kill();
+          this.paused = true;
+          window.setTimeout(() => this.game.state.start("GameOver", true, false, this.map), 750);
         }
       });
     });

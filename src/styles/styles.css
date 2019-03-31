@@ -9,3 +9,10 @@ canvas {
   margin: 0 auto;
   overflow: hidden;
 }
+
+@font-face {
+  font-family: "kenvector_future";
+	font-style: normal;
+	font-weight: 400;
+	src: url("./assets/bonus/kenvector_future.ttf");
+}

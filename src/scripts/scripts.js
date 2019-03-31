@@ -15,11 +15,21 @@ window.addEventListener("load", () => {
   class Game extends Phaser.Game {
 
     constructor() {
-      super(width, height, Phaser.AUTO);
+
+      super({
+        width,
+        height,
+        renderer: Phaser.AUTO,
+        transparent: true,
+      });
     
+      this.state.add("Boot", Boot);
+      this.state.add("Menu", Menu);
       this.state.add("Loading", Loading);
       this.state.add("Playing", Playing);
-      this.state.start("Loading", true, false, map);
+      this.state.add("GameOver", GameOver);
+      this.state.start("Boot", true, false, map);
+      
     }
   
   }
