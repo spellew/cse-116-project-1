@@ -2,6 +2,7 @@ class Loading extends Phaser.State {
 
   constructor() {
     super();
+
     this.startGame = this.startGame.bind(this);
   }
 
@@ -17,6 +18,11 @@ class Loading extends Phaser.State {
     this.game.load.image('enemy', './assets/playerShip1_red.png');
     this.game.load.image('player_bullet', './assets/lasers/laserBlue03.png');
     this.game.load.image('enemy_bullet', './assets/lasers/laserRed03.png');
+
+    this.game.load.audio('laser1', './assets/bonus/sfx_laser1.ogg');
+    this.game.load.audio('laser2', './assets/bonus/sfx_laser2.ogg');
+    this.game.load.audio('zap', './assets/bonus/sfx_zap.ogg');
+    this.game.load.audio('lose', './assets/bonus/sfx_lose.ogg');
 
     this.game.load.start();
 

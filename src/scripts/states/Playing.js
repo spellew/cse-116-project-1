@@ -4,9 +4,13 @@ class Playing extends Phaser.State {
 
   create() {
 
-    console.log("game", this.game);
+    // window.setInterval(() => console.log("isPlaying [map]: " + this.map.backgroundFx.isPlaying), 1000);
+    // window.setInterval(() => console.log("isPlaying [game]: " + this.game.backgroundFx.isPlaying), 1000);
+
+    // window.setTimeout(() => this.map.backgroundFx.pause(), 3000);
+    // window.setTimeout(() => this.game.backgroundFx.resume(), 6000);
+
     this.paused = false;
-    this.text = null;
 
     this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -17,6 +21,8 @@ class Playing extends Phaser.State {
     this.map.enemies.group = this.game.add.group();
     this.map.player = new Player({ game: this.game, map: this.map });
     this.map.enemy = new Enemy({ game: this.game, map: this.map });
+
+    this.zap = this.game.add.audio('zap', 4);
 
     this.text = this.game.add.text(this.map.meta.width * 0.5, this.map.meta.height - 75, "Player 1: WASD && ALT; Player 2: IJKL && CTRL;", {
       font: "32px Arial",
@@ -90,6 +96,7 @@ class Playing extends Phaser.State {
         enemy.healthBar.kill();
         enemy.kill();
         this.paused = true;
+        this.zap.play();
         window.setTimeout(() => this.game.state.start("GameOver", true, false, this.map), 750);
       }
     });
@@ -107,6 +114,7 @@ class Playing extends Phaser.State {
           player.healthBar.kill();
           player.kill();
           this.paused = true;
+          this.zap.play();
           window.setTimeout(() => this.game.state.start("GameOver", true, false, this.map), 750);
         }
       });
