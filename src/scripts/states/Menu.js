@@ -10,9 +10,9 @@ class Menu extends Phaser.State {
 
   create() {
 
-    console.log("menu");
+    // console.log("menu");
 
-    console.log("this.game", this.game);
+    // console.log("this.game", this.game);
 
     this.game.add.tileSprite(0, 0, this.map.meta.width * this.map.meta.bounds, this.map.meta.height * this.map.meta.bounds, 'backdrop');
 

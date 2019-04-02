@@ -4,7 +4,7 @@ class Boot extends Phaser.State {
 
   create() {
 
-    console.log("booting");
+    // console.log("booting");
 
     this.game.load.onLoadStart.add(() => {});
     this.game.load.onFileComplete.add(() => {});

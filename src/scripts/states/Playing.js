@@ -83,7 +83,10 @@ class Playing extends Phaser.State {
 
     }
 
-    this.game.world.wrap(this.map.player.sprite, 0, true);
+    if (!this.map.debug) {
+      this.game.world.wrap(this.map.player.sprite, 0, true);
+    }
+
     this.map.player.sprite.healthBar.setPosition(this.map.player.sprite.x, this.map.player.sprite.y + 60);
     this.map.player.sprite.weapon.fireAngle = this.map.player.sprite.angle - 90;
 

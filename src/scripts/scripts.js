@@ -9,7 +9,8 @@ window.addEventListener("load", () => {
     player: null,
     enemy: null,
     enemies: null,
-    meta: { width: width, height: height, bounds: bounds, scale: scale }
+    meta: { width: width, height: height, bounds: bounds, scale: scale },
+    debug: false
   }
   
   class Game extends Phaser.Game {
