@@ -34,6 +34,6 @@ window.addEventListener("load", () => {
   
   }
 
-  new Game();
+  window.game = new Game();
   
 });

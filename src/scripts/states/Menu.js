@@ -10,6 +10,10 @@ class Menu extends Phaser.State {
 
   create() {
 
+    console.log("menu");
+
+    console.log("this.game", this.game);
+
     this.game.add.tileSprite(0, 0, this.map.meta.width * this.map.meta.bounds, this.map.meta.height * this.map.meta.bounds, 'backdrop');
 
     this.text = this.game.add.text(this.map.meta.width * 0.5, this.map.meta.height * 0.5, "SPACE RACE", {
