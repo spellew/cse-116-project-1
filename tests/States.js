@@ -19,6 +19,7 @@ const setDebug = function(bool) { window.game.state.callbackContext.map.debug = 
 const getCurrentState = function() { return window.game.state.current; };
 const getPlayerPosition = function() { return window.game.state.callbackContext.map.player.sprite.position; };
 const getPlayerAngularVelocity = function() { return window.game.state.callbackContext.map.player.sprite.body.angularVelocity; };
+const getPlayerShotsFired = function() { return window.game.state.callbackContext.map.player.sprite.weapon.shots; };
 
 const startPlayerAngularVelocityChange = function({ page, key }) {
   return new Promise(async (resolve) => {
@@ -150,6 +151,23 @@ describe("Tests the Phaser game and it's states.", function() {
       })
         .catch(async (err) => assert.fail(err.message));
     }).timeout(4000);
+
+    it("Can player fire shots after keypress?", function() {
+      return new Promise(async (resolve) => {
+        
+        let shotsFired = null;
+
+        shotsFired = await page.evaluate(getPlayerShotsFired);
+        expect(shotsFired).to.equal(0);
+        await page.keyboard.press("AltLeft", { delay: 750 });
+        
+        shotsFired = await page.evaluate(getPlayerShotsFired);
+        expect(shotsFired).to.be.above(0);
+        resolve();
+
+      })
+        .catch(async (err) => assert.fail(err.message));
+    }).timeout(2000);
 
   }
 
